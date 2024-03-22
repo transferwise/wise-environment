@@ -1,0 +1,121 @@
+name: "Build and Test"
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  matrix_build:
+    name: "Matrix Build"
+    runs-on:
+      - ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 100
+      matrix:
+        spring_boot_version:
+          - 3.2.2
+          - 3.1.2
+          - 3.0.9
+          - 2.7.14
+    container:
+      image: azul/zulu-openjdk:17
+    env:
+      SPRING_BOOT_VERSION: ${{ matrix.spring_boot_version }}
+      GRADLE_OPTS: "-Djava.security.egd=file:/dev/./urandom -Dorg.gradle.parallel=true"
+      IN_CI: true
+    steps:
+      - name: "Install packages"
+        run: apt-get update && apt-get install -y git unzip docker docker-compose
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-home-cache-cleanup: true
+          # Comment out when you are upgrading gradle in a branch and doing tons of commits you would need to test.
+          # cache-read-only: false
+      - name: "Assemble jar"
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: assemble --console=plain --info --stacktrace --parallel
+      - name: "Compile tests"
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: compileTest --console=plain --info --stacktrace --parallel
+      - name: "Run checks"
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: check -x test --console=plain --stacktrace
+      - name: "Run tests"
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: -Dspring.profiles.include=continuous-integration test --console=plain --info --stacktrace
+      - name: "Test if publishing works"
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: publishToMavenLocal --console=plain --info --stacktrace
+      - name: "Publish Test Report"
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          check_name: Test Report-(${{ matrix.spring_boot_version }})
+          report_paths: '**/build/test-results/**/*.xml'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          require_tests: true
+      - name: Publish checkstyle report
+        if: always()
+        uses: jwgmeligmeyling/checkstyle-github-action@master
+        with:
+          name: Checkstyle Report-(${{ matrix.spring_boot_version }})
+          path: '**/build/reports/**/*.xml'
+      - name: Publish spotbugs report
+        if: failure()
+        uses: jwgmeligmeyling/spotbugs-github-action@master
+        with:
+          name: Spotbugs Report-(${{ matrix.spring_boot_version }})
+          path: '**/build/reports/**/*.xml'
+      - name: "Collect test reports"
+        run: |
+          tar -zcvf all-test-reports-${{ matrix.spring_boot_version }}.tar.gz **/build/reports
+        if: always()
+      - name: "Store test results"
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: all-test-reports-${{ matrix.spring_boot_version }}
+          path: all-test-reports-${{ matrix.spring_boot_version }}.tar.gz
+          retention-days: 7
+  build:
+    name: "Build and Test"
+    runs-on:
+      - ubuntu-latest
+    needs: matrix_build
+    container:
+      image: azul/zulu-openjdk:17
+    steps:
+      # Needed hacks to properly fail the build when one matrix build fails.
+      - name: Do something so that GHA is happy
+        run: echo "Be happy!"
+      - name: Verify matrix jobs succeeded
+        if: ${{ needs.matrix_build.result != 'success' }}
+        run: exit 1
+      - name: "Install packages"
+        run: apt-get update && apt-get install -y git unzip
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-home-cache-cleanup: true
+          # Comment out when you are upgrading gradle in a branch and doing tons of commits you would need to test.
+          # cache-read-only: false
+      - name: "Tag release"
+        if: github.ref == 'refs/heads/master'
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: tagRelease --console=plain --info --stacktrace

@@ -1,0 +1,53 @@
+import com.github.spotbugs.snom.Confidence
+import com.github.spotbugs.snom.Effort
+import org.eclipse.jgit.api.errors.RefAlreadyExistsException
+
+plugins {
+    id "com.github.spotbugs" version "+"
+    id "idea"
+    id 'org.ajoberstar.grgit' version '+'
+    id 'io.github.gradle-nexus.publish-plugin' version "1.1.0"
+}
+
+idea.project {
+    vcs = 'Git'
+    languageLevel = JavaVersion.VERSION_17
+    targetBytecodeVersion = JavaVersion.VERSION_17
+}
+
+ext.projectName = "Wise Environment"
+ext.projectDescription = "Wise Environment"
+ext.projectArtifactName = "wise-environment-starter"
+
+apply from: 'build.common.gradle'
+
+tasks.register('tagRelease') {
+    doLast {
+        try {
+            grgit.tag.add {
+                name = "v$version"
+                message = "Release of ${version}"
+            }
+            grgit.push(refsOrSpecs: ["v$version"])
+        }
+        catch (RefAlreadyExistsException ignored) {
+            logger.warn("Tag v$version already exists.")
+        }
+    }
+}
+
+group = "com.transferwise.common"
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            username = System.getenv("SONATYPE_USER")
+            password = System.getenv("SONATYPE_PASSWORD")
+        }
+    }
+}
+
+spotbugs {
+    effort = Effort.valueOf('MAX')
+    reportLevel = Confidence.valueOf('DEFAULT')
+}

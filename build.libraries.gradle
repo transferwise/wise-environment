@@ -1,0 +1,14 @@
+ext {
+    springBootVersion = "${System.getenv("SPRING_BOOT_VERSION") ?: "2.7.18"}"
+
+    libraries = [
+            // version defined
+            spotbugsAnnotations   : "com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}",
+            springBootDependencies: "org.springframework.boot:spring-boot-dependencies:${springBootVersion}",
+
+            // versions managed by spring-boot-dependencies platform
+            lombok                : 'org.projectlombok:lombok',
+            springBootStarter     : "org.springframework.boot:spring-boot-starter",
+            springBootStarterTest : "org.springframework.boot:spring-boot-starter-test"
+    ]
+}

@@ -1,0 +1,7 @@
+wise:
+  environment:
+    core:
+      type: integration_test
+    test:
+      value1: blah
+      value3: blah

@@ -1,0 +1,10 @@
+ext.projectArtifactName = "wise-environment"
+
+apply from: "$rootProject.rootDir/build.common.gradle"
+apply from: "$rootProject.rootDir/build.library.gradle"
+
+dependencies {
+    compileOnly libraries.springBootStarter
+
+    testImplementation libraries.springBootStarterTest
+}

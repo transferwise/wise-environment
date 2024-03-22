@@ -1,0 +1,3 @@
+rootProject.name = 'wise-environment'
+
+include 'wise-environment-starter'

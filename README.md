@@ -9,15 +9,17 @@
 
 Provides information to other libraries in which environment they are running in.
 
-Allows to set default properties via environment variables and system properties.
+Allows to set default properties for specific environments.
 
-Those have to prefixed respectively with
-* `WISE_DEFAULTS_`
-* `wise.defaults.`
+Typical use case is for various Wise libraries to set environment specific default properties in their `EnvironmentPostProcessor` implementations.
 
-E.g.
-* `WISE_DEFAULTS_WISE_ENVIRONMENT_TEST_VALUE1`
-* `wise.defaults.wise.environment.test.value4`
+```java
+WiseEnvironment.setDefaultProperty(WiseEnvironment.PRODUCTION, "tw-reliable-jdbc.sslMode", SslMode.VERIFY_FULL);
+WiseEnvironment.setDefaultProperty(WiseEnvironment.STAGING, "tw-reliable-jdbc.sslMode", SslMode.PREFERRED);
+WiseEnvironment.setDefaultProperty(WiseEnvironment.CUSTOM_ENVIRONMENT, "tw-reliable-jdbc.sslMode", SslMode.VERIFY_CA);
+```
+
+See `WiseEnvironment` class for other optional use cases. E.g. asking which environments are currently active.
 
 ## License
 Copyright 2024 TransferWise Ltd.

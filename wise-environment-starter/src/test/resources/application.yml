@@ -1,7 +1,23 @@
 wise:
   environment:
-    core:
-      type: integration_test
     test:
       value1: blah
       value3: blah
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: application1
+
+wise.environments.active: pci_plastic_staging
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: application2
+
+wise.environments.active: development, staging, pci_plastic_staging

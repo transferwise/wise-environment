@@ -7,8 +7,9 @@ ext {
             springBootDependencies: "org.springframework.boot:spring-boot-dependencies:${springBootVersion}",
 
             // versions managed by spring-boot-dependencies platform
+            commonsLang3          : 'org.apache.commons:commons-lang3',
             lombok                : 'org.projectlombok:lombok',
             springBootStarter     : "org.springframework.boot:spring-boot-starter",
-            springBootStarterTest : "org.springframework.boot:spring-boot-starter-test"
+            springBootStarterTest : "org.springframework.boot:spring-boot-starter-test",
     ]
 }

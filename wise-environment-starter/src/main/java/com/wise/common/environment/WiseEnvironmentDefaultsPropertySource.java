@@ -1,13 +1,15 @@
 package com.wise.common.environment;
 
+import com.wise.common.environment.WiseEnvironmentDefaultsPropertySource.WiseEnvironmentDefaultsPropertySourceSource;
 import org.springframework.boot.origin.Origin;
 import org.springframework.boot.origin.OriginLookup;
 import org.springframework.core.env.EnumerablePropertySource;
 
-public class WiseEnvironmentDefaultsPropertySource extends EnumerablePropertySource<String> implements OriginLookup<String> {
+public class WiseEnvironmentDefaultsPropertySource extends EnumerablePropertySource<WiseEnvironmentDefaultsPropertySourceSource> implements
+    OriginLookup<String> {
 
   public WiseEnvironmentDefaultsPropertySource() {
-    super("WiseEnvironmentAwareDefaultsPropertySource", "WiseEnvironmentAwareDefaultsPropertySource");
+    super("WiseEnvironmentAwareDefaultsPropertySource", new WiseEnvironmentDefaultsPropertySourceSource());
   }
 
   @Override
@@ -22,7 +24,16 @@ public class WiseEnvironmentDefaultsPropertySource extends EnumerablePropertySou
 
   @Override
   public Origin getOrigin(String name) {
-    var container = WiseEnvironment.getDefaultPropertyContainer(this.name);
+    var container = WiseEnvironment.getDefaultPropertyContainer(name);
     return container == null ? null : container.getOrigin();
+  }
+
+  static class WiseEnvironmentDefaultsPropertySourceSource implements OriginLookup<String> {
+
+    @Override
+    public Origin getOrigin(String name) {
+      var container = WiseEnvironment.getDefaultPropertyContainer(name);
+      return container == null ? null : container.getOrigin();
+    }
   }
 }

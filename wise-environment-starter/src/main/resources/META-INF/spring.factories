@@ -1,2 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.wise.common.environment.WiseEnvironmentAutoConfiguration
 org.springframework.boot.env.EnvironmentPostProcessor=com.wise.common.environment.WiseEnvironmentEnvironmentPostProcessor

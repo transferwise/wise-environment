@@ -1,7 +1,7 @@
 # Wise Environment.
 
 ![Apache 2](https://img.shields.io/hexpm/l/plug.svg)
-![Java 11](https://img.shields.io/badge/Java-11-blue.svg)
+![Java 17](https://img.shields.io/badge/Java-17-blue.svg)
 ![Maven Central](https://badgen.net/maven/v/maven-central/com.transferwise.common/wise-environment)
 [![Owners](https://img.shields.io/badge/team-AppEng-blueviolet.svg?logo=wise)](https://transferwise.atlassian.net/wiki/spaces/EKB/pages/2520812116/Application+Engineering+Team) [![Slack](https://img.shields.io/badge/slack-sre--guild-blue.svg?logo=slack)](https://app.slack.com/client/T026FB76G/CLR1U8SNS)
 > Use the `@application-engineering-on-call` handle on Slack for help.
@@ -9,15 +9,41 @@
 
 Provides information to other libraries in which environment they are running in.
 
-Allows to set default properties via environment variables and system properties.
+Allows to set default properties for specific environments.
 
-Those have to prefixed respectively with
-* `WISE_DEFAULTS_`
-* `wise.defaults.`
+Typical use case is for various Wise libraries to set environment specific default properties in their `EnvironmentPostProcessor` implementations.
 
-E.g.
-* `WISE_DEFAULTS_WISE_ENVIRONMENT_TEST_VALUE1`
-* `wise.defaults.wise.environment.test.value4`
+```java
+WiseEnvironment.setDefaultProperty("my-library", WiseEnvironment.PRODUCTION, "tw-reliable-jdbc.sslMode", SslMode.VERIFY_FULL);
+WiseEnvironment.setDefaultProperty("my-library", WiseEnvironment.STAGING, "tw-reliable-jdbc.sslMode", SslMode.PREFERRED);
+WiseEnvironment.setDefaultProperty("my-library", WiseEnvironment.CUSTOM_ENVIRONMENT, "tw-reliable-jdbc.sslMode", SslMode.VERIFY_CA);
+```
+
+See `WiseEnvironment` class for other optional use cases. E.g. asking which environments are currently active.
+
+The environments themselves can be hierarchical. In that sense, that if you set a default property to `STAGING`, it would also apply to
+`CUSTOM_ENVIRONMENT`, unless a different value is specifically set for `CUSTOM_ENVIRONMENT`.
+
+Also, a convenience DSL is available for setting properties. E.g.
+
+```java
+WiseEnvironment.setDefaultProperties(dsl -> dsl
+    .source("tw-reliable-jdbc")
+
+    .environment(WiseEnvironment.WISE)
+    .set(TW_OBS_BASE_EXTREMUM_CONFIG_PATH, gaugeNames)
+    .set("spring.flyway.validate-migration-naming", "true")
+
+    .keyPrefix("tw-reliable-jdbc.")
+    .environment(WiseEnvironment.PRODUCTION)
+    .set("sslMode", SslMode.VERIFY_FULL)
+    .set("requiredSslModeLevel", SslMode.VERIFY_CA)
+    .set("requireMinPoolSizePct", 100d)
+
+    .environment(WiseEnvironment.STAGING)
+    .set("sslMode", SslMode.VERIFY_FULL)
+);
+```
 
 ## License
 Copyright 2024 TransferWise Ltd.

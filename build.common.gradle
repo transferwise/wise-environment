@@ -12,7 +12,6 @@ apply plugin: "java-library"
 apply plugin: "checkstyle"
 apply plugin: "idea"
 apply plugin: "com.github.spotbugs"
-apply plugin: "groovy"
 
 apply from: "$rootProject.rootDir/build.libraries.gradle"
 
@@ -90,12 +89,6 @@ compileTestJava {
 
 test {
     useJUnitPlatform()
-
-    environment("WISE_DEFAULTS_WISE_ENVIRONMENT_TEST_VALUE1", "foo")
-    environment("WISE_DEFAULTS_WISE_ENVIRONMENT_TEST_VALUE2", "foo")
-    environment("WISE_ENVIRONMENT_TEST_VALUE3", "foo")
-
-    systemProperty("wise.defaults.wise.environment.test.value4", "foo")
 
     testLogging {
         events TestLogEvent.STARTED, TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.PASSED,

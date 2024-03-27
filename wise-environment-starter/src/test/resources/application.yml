@@ -1,11 +1,3 @@
-wise:
-  environment:
-    test:
-      value1: blah
-      value3: blah
-
----
-
 spring:
   config:
     activate:

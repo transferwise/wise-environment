@@ -21,6 +21,9 @@ WiseEnvironment.setDefaultProperty(WiseEnvironment.CUSTOM_ENVIRONMENT, "tw-relia
 
 See `WiseEnvironment` class for other optional use cases. E.g. asking which environments are currently active.
 
+The environments themselves can be hierarchical. In that sense, that if you set a default property to `STAGING`, it would also apply to
+`CUSTOM_ENVIRONMENT`, unless a different value is specifically set for `CUSTOM_ENVIRONMENT`.
+
 ## License
 Copyright 2024 TransferWise Ltd.
 

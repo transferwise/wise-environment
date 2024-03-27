@@ -17,9 +17,9 @@ public class WiseEnvironmentEnvironmentPostProcessor implements EnvironmentPostP
     final var activeEnvironments = wiseEnvironmentDetector.detect();
 
     if (activeEnvironments.isEmpty()) {
-      log.info("No active wise environments detected.");
+      log.info("No active Wise environments detected.");
     } else {
-      log.info("Active wise environments detected are '{}'.", activeEnvironments.stream().map(Enum::name).collect(Collectors.joining(",")));
+      log.info("Active Wise environments detected are '{}'.", activeEnvironments.stream().map(Enum::name).collect(Collectors.joining(",")));
     }
 
     WiseEnvironment.init(activeEnvironments);

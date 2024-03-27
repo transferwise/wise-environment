@@ -115,7 +115,7 @@ jobs:
           # Comment out when you are upgrading gradle in a branch and doing tons of commits you would need to test.
           # cache-read-only: false
       - name: "Tag release"
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         uses: gradle/gradle-build-action@v2
         with:
           arguments: tagRelease --console=plain --info --stacktrace

@@ -1,6 +1,5 @@
-package com.wise.common.environment.impl;
+package com.wise.common.environment;
 
-import com.wise.common.environment.WiseEnvironment;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;

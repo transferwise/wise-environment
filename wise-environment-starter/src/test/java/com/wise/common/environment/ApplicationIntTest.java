@@ -25,12 +25,29 @@ public class ApplicationIntTest {
 
   @Test
   void defaultsCanBeSet() {
-    WiseEnvironment.setDefaultProperty("mykey", "robot");
+    WiseEnvironment.setDefaultProperty("mySource", "mykey", "robot");
 
-    WiseEnvironment.setDefaultProperty(WiseEnvironment.TEST, "mykey", "cat");
+    WiseEnvironment.setDefaultProperty("mySource", WiseEnvironment.TEST, "mykey", "cat");
     assertThat(environment.getProperty("mykey"), equalTo("cat"));
+    assertThat(WiseEnvironment.getDefaultPropertyContainer("mykey").getOrigin().getEnvironment(), equalTo(WiseEnvironment.TEST));
 
-    WiseEnvironment.setDefaultProperty(WiseEnvironment.INTEGRATION_TEST, "mykey", "dog");
+    WiseEnvironment.setDefaultProperty("mySource", WiseEnvironment.INTEGRATION_TEST, "mykey", "dog");
     assertThat(environment.getProperty("mykey"), equalTo("dog"));
+
+    assertThat(WiseEnvironment.getDefaultPropertyContainer("mykey").getOrigin().getEnvironment(), equalTo(WiseEnvironment.INTEGRATION_TEST));
+
+    WiseEnvironment.setDefaultProperties(dsl -> dsl
+        .source("mySource")
+        .environment(WiseEnvironment.UNIT_TEST)
+        .keyPrefix("prefix.")
+        .set("myotherkey", "horse")
+        .environment(WiseEnvironment.TEST)
+        .set("myotherkey", "mouse")
+        .keyPrefix(null)
+        .set("onemorekey", "moose")
+    );
+    assertThat(environment.getProperty("prefix.myotherkey"), equalTo("mouse"));
+    assertThat(environment.getProperty("onemorekey"), equalTo("moose"));
+
   }
 }

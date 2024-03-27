@@ -1,12 +1,11 @@
 package com.wise.common.environment;
 
-import com.wise.common.environment.impl.CachingWiseEnvironmentProvider;
-import com.wise.common.environment.impl.WiseEnvironmentProvider;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -51,7 +50,7 @@ public enum WiseEnvironment {
     return StringUtils.isAllLowerCase(name) ? NAME_INDEX.get(name) : NAME_INDEX.get(name.toLowerCase());
   }
 
-  private static final Map<WiseEnvironment, Map<String, Object>> defaultProperties = new ConcurrentHashMap<>();
+  private static final Map<WiseEnvironment, Map<String, PropertyContainer>> defaultProperties = new ConcurrentHashMap<>();
 
   private static final Map<List<WiseEnvironment>, String[]> defaultPropertyNamesCache = new ConcurrentHashMap<>();
 
@@ -61,14 +60,14 @@ public enum WiseEnvironment {
     wiseEnvironmentProvider = new CachingWiseEnvironmentProvider(activeEnvironments);
   }
 
-  public static void setDefaultProperty(String key, Object value) {
-    setDefaultProperty(WiseEnvironment.WISE, key, value);
+  public static void setDefaultProperty(String source, String name, Object value) {
+    setDefaultProperty(source, WiseEnvironment.WISE, name, value);
   }
 
-  public static void setDefaultProperty(WiseEnvironment wiseEnvironment, String key, Object value) {
+  public static void setDefaultProperty(String source, WiseEnvironment wiseEnvironment, String name, Object value) {
     defaultProperties
         .computeIfAbsent(wiseEnvironment, k -> new ConcurrentHashMap<>())
-        .put(key, value);
+        .put(name, new PropertyContainer(source, wiseEnvironment, value));
 
     defaultPropertyNamesCache.clear();
   }
@@ -81,7 +80,7 @@ public enum WiseEnvironment {
     return wiseEnvironmentProvider.isEnvironmentActive(environment);
   }
 
-  public static Object getDefaultProperty(String name) {
+  static PropertyContainer getDefaultPropertyContainer(String name) {
     var activeEnvironments = getActiveEnvironments();
 
     if (activeEnvironments != null) {
@@ -101,6 +100,11 @@ public enum WiseEnvironment {
     }
 
     return null;
+  }
+
+  public static Object getDefaultProperty(String name) {
+    var container = getDefaultPropertyContainer(name);
+    return container == null ? null : container.getValue();
   }
 
   public static String[] getDefaultPropertyNames() {
@@ -125,5 +129,9 @@ public enum WiseEnvironment {
       }
       return result.toArray(new String[0]);
     });
+  }
+
+  public static void setDefaultProperties(Consumer<PropertiesSetterDsl> dslConsumer) {
+    dslConsumer.accept(new DefaultPropertiesSetterDsl());
   }
 }

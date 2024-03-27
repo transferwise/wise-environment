@@ -14,15 +14,36 @@ Allows to set default properties for specific environments.
 Typical use case is for various Wise libraries to set environment specific default properties in their `EnvironmentPostProcessor` implementations.
 
 ```java
-WiseEnvironment.setDefaultProperty(WiseEnvironment.PRODUCTION, "tw-reliable-jdbc.sslMode", SslMode.VERIFY_FULL);
-WiseEnvironment.setDefaultProperty(WiseEnvironment.STAGING, "tw-reliable-jdbc.sslMode", SslMode.PREFERRED);
-WiseEnvironment.setDefaultProperty(WiseEnvironment.CUSTOM_ENVIRONMENT, "tw-reliable-jdbc.sslMode", SslMode.VERIFY_CA);
+WiseEnvironment.setDefaultProperty("my-library", WiseEnvironment.PRODUCTION, "tw-reliable-jdbc.sslMode", SslMode.VERIFY_FULL);
+WiseEnvironment.setDefaultProperty("my-library", WiseEnvironment.STAGING, "tw-reliable-jdbc.sslMode", SslMode.PREFERRED);
+WiseEnvironment.setDefaultProperty("my-library", WiseEnvironment.CUSTOM_ENVIRONMENT, "tw-reliable-jdbc.sslMode", SslMode.VERIFY_CA);
 ```
 
 See `WiseEnvironment` class for other optional use cases. E.g. asking which environments are currently active.
 
 The environments themselves can be hierarchical. In that sense, that if you set a default property to `STAGING`, it would also apply to
 `CUSTOM_ENVIRONMENT`, unless a different value is specifically set for `CUSTOM_ENVIRONMENT`.
+
+Also, a convenience DSL is available for setting properties. E.g.
+
+```java
+WiseEnvironment.setDefaultProperties(dsl -> dsl
+    .source("tw-reliable-jdbc")
+
+    .environment(WiseEnvironment.WISE)
+    .set(TW_OBS_BASE_EXTREMUM_CONFIG_PATH, gaugeNames)
+    .set("spring.flyway.validate-migration-naming", "true")
+
+    .keyPrefix("tw-reliable-jdbc.")
+    .environment(WiseEnvironment.PRODUCTION)
+    .set("sslMode", SslMode.VERIFY_FULL)
+    .set("requiredSslModeLevel", SslMode.VERIFY_CA)
+    .set("requireMinPoolSizePct", 100d)
+
+    .environment(WiseEnvironment.STAGING)
+    .set("sslMode", SslMode.VERIFY_FULL)
+);
+```
 
 ## License
 Copyright 2024 TransferWise Ltd.

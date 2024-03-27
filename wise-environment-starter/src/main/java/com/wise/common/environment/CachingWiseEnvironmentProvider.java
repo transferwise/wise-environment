@@ -1,6 +1,5 @@
-package com.wise.common.environment.impl;
+package com.wise.common.environment;
 
-import com.wise.common.environment.WiseEnvironment;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

@@ -18,30 +18,31 @@ public class ApplicationIntTest {
 
   @Test
   void applicationIsConfigured() {
-    assertTrue(WiseEnvironment.isEnvironmentActive(WiseEnvironment.TEST));
-    assertTrue(WiseEnvironment.isEnvironmentActive(WiseEnvironment.INTEGRATION_TEST));
-    assertFalse(WiseEnvironment.isEnvironmentActive(WiseEnvironment.UNIT_TEST));
+    assertTrue(WiseEnvironment.isProfileActive(WiseProfile.TEST));
+    assertTrue(WiseEnvironment.isProfileActive(WiseProfile.INTEGRATION_TEST));
+    assertFalse(WiseEnvironment.isProfileActive(WiseProfile.UNIT_TEST));
   }
 
   @Test
   void defaultsCanBeSet() {
     WiseEnvironment.setDefaultProperty("mySource", "mykey", "robot");
 
-    WiseEnvironment.setDefaultProperty("mySource", WiseEnvironment.TEST, "mykey", "cat");
+    WiseEnvironment.setDefaultProperty("mySource", WiseProfile.TEST, "mykey", "cat");
     assertThat(environment.getProperty("mykey"), equalTo("cat"));
-    assertThat(WiseEnvironment.getDefaultPropertyContainer("mykey").getOrigin().getEnvironment(), equalTo(WiseEnvironment.TEST));
+    assertThat(WiseEnvironment.getDefaultPropertyContainer("mykey").getOrigin().getProfile(), equalTo(WiseProfile.TEST));
 
-    WiseEnvironment.setDefaultProperty("mySource", WiseEnvironment.INTEGRATION_TEST, "mykey", "dog");
+    WiseEnvironment.setDefaultProperty("mySource", WiseProfile.INTEGRATION_TEST, "mykey", "dog");
     assertThat(environment.getProperty("mykey"), equalTo("dog"));
 
-    assertThat(WiseEnvironment.getDefaultPropertyContainer("mykey").getOrigin().getEnvironment(), equalTo(WiseEnvironment.INTEGRATION_TEST));
+    assertThat(WiseEnvironment.getDefaultPropertyContainer("mykey").getOrigin().getProfile(), equalTo(
+        WiseProfile.INTEGRATION_TEST));
 
     WiseEnvironment.setDefaultProperties(dsl -> dsl
         .source("mySource")
-        .environment(WiseEnvironment.UNIT_TEST)
+        .profile(WiseProfile.UNIT_TEST)
         .keyPrefix("prefix.")
         .set("myotherkey", "horse")
-        .environment(WiseEnvironment.TEST)
+        .profile(WiseProfile.TEST)
         .set("myotherkey", "mouse")
         .keyPrefix(null)
         .set("onemorekey", "moose")

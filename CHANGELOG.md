@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.3] - 2024-04-02
 
+### Changed
+
 * `wise.environments.active` property was renamed to `wise.profiles.active`.
 
 * "Environment" and "active profile" terms were separated in the code.
@@ -15,4 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.2] - 2024-03-27
 
-Initial version.
+### Added
+
+* Initial version.

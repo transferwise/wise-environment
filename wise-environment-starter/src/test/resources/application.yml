@@ -3,7 +3,7 @@ spring:
     activate:
       on-profile: application1
 
-wise.environments.active: pci_plastic_staging
+wise.profiles.active: pci_plastic_staging
 
 ---
 
@@ -12,4 +12,4 @@ spring:
     activate:
       on-profile: application2
 
-wise.environments.active: development, staging, pci_plastic_staging
+wise.profiles.active: development, staging, pci_plastic_staging

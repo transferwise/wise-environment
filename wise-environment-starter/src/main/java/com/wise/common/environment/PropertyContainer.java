@@ -11,30 +11,30 @@ public class PropertyContainer {
 
   private Object value;
 
-  private WiseEnvironmentOrigin origin;
+  private WiseEnvironmentPropertyOrigin origin;
 
-  public PropertyContainer(String source, WiseEnvironment environment, Object value) {
+  public PropertyContainer(String source, WiseProfile profile, Object value) {
     Assert.notNull(value, "Value must not be null");
-    this.origin = new WiseEnvironmentOrigin(source, environment);
+    this.origin = new WiseEnvironmentPropertyOrigin(source, profile);
     this.value = value;
   }
 
   @Data
-  public static class WiseEnvironmentOrigin implements Origin {
+  public static class WiseEnvironmentPropertyOrigin implements Origin {
 
     private String source;
 
-    private WiseEnvironment environment;
+    private WiseProfile profile;
 
-    public WiseEnvironmentOrigin(String source, WiseEnvironment environment) {
+    public WiseEnvironmentPropertyOrigin(String source, WiseProfile profile) {
       Assert.notNull(source, "Source must not be null");
-      Assert.notNull(environment, "Environment must not be null");
+      Assert.notNull(profile, "Profile must not be null");
       this.source = source;
-      this.environment = environment;
+      this.profile = profile;
     }
 
     public String toString() {
-      return "Wise environment: '" + environment + "', source: '" + source + "'";
+      return "Wise profile: '" + profile + "', source: '" + source + "'";
     }
   }
 }

@@ -13,21 +13,21 @@ public class DefaultWiseEnvironmentDetector implements WiseEnvironmentDetector {
   }
 
   @Override
-  public List<WiseEnvironment> detect() {
-    final var result = new ArrayList<WiseEnvironment>();
+  public List<WiseProfile> detectActiveProfiles() {
+    final var result = new ArrayList<WiseProfile>();
     final var envs = StringUtils.split(value, ",");
     if (envs != null) {
       for (var env : envs) {
         final var trimmedEnv = StringUtils.trim(env);
-        result.add(WiseEnvironment.getByName(trimmedEnv));
+        result.add(WiseProfile.getByName(trimmedEnv));
       }
     }
 
     if (result.isEmpty()) {
       if (isExecutedByIntegrationTest()) {
-        result.add(WiseEnvironment.INTEGRATION_TEST);
+        result.add(WiseProfile.INTEGRATION_TEST);
       } else if (isExecutedByTest()) {
-        result.add(WiseEnvironment.UNIT_TEST);
+        result.add(WiseProfile.UNIT_TEST);
       }
     }
 

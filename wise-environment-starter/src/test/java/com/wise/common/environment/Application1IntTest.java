@@ -12,8 +12,8 @@ public class Application1IntTest {
 
   @Test
   void applicationIsConfigured() {
-    assertTrue(WiseEnvironment.isEnvironmentActive(WiseEnvironment.PCI_PLASTIC_STAGING));
-    assertTrue(WiseEnvironment.isEnvironmentActive(WiseEnvironment.STAGING));
+    assertTrue(WiseEnvironment.isProfileActive(WiseProfile.PCI_PLASTIC_STAGING));
+    assertTrue(WiseEnvironment.isProfileActive(WiseProfile.STAGING));
   }
 
 }

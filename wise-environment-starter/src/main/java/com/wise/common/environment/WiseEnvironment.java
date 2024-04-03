@@ -1,100 +1,57 @@
 package com.wise.common.environment;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
-@Slf4j
-public enum WiseEnvironment {
-  WISE,
+public class WiseEnvironment {
 
-  PRODUCTION(WISE),
-  PCI_PLASTIC_PRODUCTION(PRODUCTION),
+  private static WiseActiveProfilesProvider wiseActiveProfilesProvider;
 
-  STAGING(WISE),
-  CUSTOM_ENVIRONMENT(STAGING),
-  SANDBOX(STAGING),
-  PCI_PLASTIC_STAGING(STAGING),
+  static final Map<WiseProfile, Map<String, PropertyContainer>> defaultProperties = new ConcurrentHashMap<>();
+  private static final Map<List<WiseProfile>, String[]> defaultPropertyNamesCache = new ConcurrentHashMap<>();
 
-  TEST(WISE),
-  INTEGRATION_TEST(TEST),
-  UNIT_TEST(TEST),
-
-  DEVELOPMENT(WISE),
-
-  DEVELOPMENT_AGAINST_CUSTOM_ENVIRONMENT(DEVELOPMENT);
-
-  private WiseEnvironment parent;
-
-  WiseEnvironment() {
-  }
-
-  WiseEnvironment(WiseEnvironment parent) {
-    this.parent = parent;
-  }
-
-  public WiseEnvironment parent() {
-    return parent;
-  }
-
-  private static final Map<String, WiseEnvironment> NAME_INDEX =
-      Arrays.stream(WiseEnvironment.values()).collect(Collectors.toMap(we -> we.name().toLowerCase(), we -> we));
-
-  public static WiseEnvironment getByName(String name) {
-    return StringUtils.isAllLowerCase(name) ? NAME_INDEX.get(name) : NAME_INDEX.get(name.toLowerCase());
-  }
-
-  private static final Map<WiseEnvironment, Map<String, PropertyContainer>> defaultProperties = new ConcurrentHashMap<>();
-
-  private static final Map<List<WiseEnvironment>, String[]> defaultPropertyNamesCache = new ConcurrentHashMap<>();
-
-  private static WiseEnvironmentProvider wiseEnvironmentProvider;
-
-  public static void init(List<WiseEnvironment> activeEnvironments) {
-    wiseEnvironmentProvider = new CachingWiseEnvironmentProvider(activeEnvironments);
+  public static void init(List<WiseProfile> activeProfiles) {
+    wiseActiveProfilesProvider = new CachingWiseActiveProfilesProvider(activeProfiles);
   }
 
   public static void setDefaultProperty(String source, String name, Object value) {
-    setDefaultProperty(source, WiseEnvironment.WISE, name, value);
+    setDefaultProperty(source, WiseProfile.WISE, name, value);
   }
 
-  public static void setDefaultProperty(String source, WiseEnvironment wiseEnvironment, String name, Object value) {
+  public static void setDefaultProperty(String source, WiseProfile wiseProfile, String name, Object value) {
     defaultProperties
-        .computeIfAbsent(wiseEnvironment, k -> new ConcurrentHashMap<>())
-        .put(name, new PropertyContainer(source, wiseEnvironment, value));
+        .computeIfAbsent(wiseProfile, k -> new ConcurrentHashMap<>())
+        .put(name, new PropertyContainer(source, wiseProfile, value));
 
     defaultPropertyNamesCache.clear();
   }
 
-  public static List<WiseEnvironment> getActiveEnvironments() {
-    return wiseEnvironmentProvider.getActiveEnvironments();
+  public static List<WiseProfile> getActiveProfiles() {
+    return wiseActiveProfilesProvider.getActiveProfiles();
   }
 
-  public static boolean isEnvironmentActive(WiseEnvironment environment) {
-    return wiseEnvironmentProvider.isEnvironmentActive(environment);
+  public static boolean isProfileActive(WiseProfile profile) {
+    return wiseActiveProfilesProvider.isProfileActive(profile);
   }
 
   static PropertyContainer getDefaultPropertyContainer(String name) {
-    var activeEnvironments = getActiveEnvironments();
+    var activeProfiles = getActiveProfiles();
 
-    if (activeEnvironments != null) {
-      for (var activeEnvironment : activeEnvironments) {
-        while (activeEnvironment != null) {
-          var envProps = WiseEnvironment.defaultProperties.get(activeEnvironment);
-          if (envProps != null) {
-            var value = envProps.get(name);
+    if (activeProfiles != null) {
+      for (var activeProfile : activeProfiles) {
+        while (activeProfile != null) {
+          var props = defaultProperties.get(activeProfile);
+          if (props != null) {
+            var value = props.get(name);
             if (value != null) {
               return value;
             }
           }
 
-          activeEnvironment = activeEnvironment.parent();
+          activeProfile = activeProfile.parent();
         }
       }
     }
@@ -108,23 +65,23 @@ public enum WiseEnvironment {
   }
 
   public static String[] getDefaultPropertyNames() {
-    var activeEnvironments = getActiveEnvironments();
+    var activeProfiles = getActiveProfiles();
 
-    if (activeEnvironments == null) {
+    if (activeProfiles == null) {
       return new String[0];
     }
 
-    return defaultPropertyNamesCache.computeIfAbsent(activeEnvironments, k -> {
+    return defaultPropertyNamesCache.computeIfAbsent(activeProfiles, k -> {
       var result = new HashSet<String>();
 
-      for (var activeEnvironment : activeEnvironments) {
-        while (activeEnvironment != null) {
-          var envProps = WiseEnvironment.defaultProperties.get(activeEnvironment);
-          if (envProps != null) {
-            result.addAll(envProps.keySet());
+      for (var activeProfile : activeProfiles) {
+        while (activeProfile != null) {
+          var props = defaultProperties.get(activeProfile);
+          if (props != null) {
+            result.addAll(props.keySet());
           }
 
-          activeEnvironment = activeEnvironment.parent();
+          activeProfile = activeProfile.parent();
         }
       }
       return result.toArray(new String[0]);

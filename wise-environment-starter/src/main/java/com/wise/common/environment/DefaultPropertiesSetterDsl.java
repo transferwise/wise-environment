@@ -3,7 +3,7 @@ package com.wise.common.environment;
 public class DefaultPropertiesSetterDsl implements PropertiesSetterDsl {
 
   private String source;
-  private WiseEnvironment wiseEnvironment;
+  private WiseProfile wiseProfile;
 
   private String keyPrefix;
 
@@ -20,8 +20,8 @@ public class DefaultPropertiesSetterDsl implements PropertiesSetterDsl {
   class Dsl0Impl implements Dsl0 {
 
     @Override
-    public Dsl2 environment(WiseEnvironment wiseEnvironment) {
-      DefaultPropertiesSetterDsl.this.wiseEnvironment = wiseEnvironment;
+    public Dsl2 profile(WiseProfile profile) {
+      DefaultPropertiesSetterDsl.this.wiseProfile = profile;
       return dsl2;
     }
 
@@ -35,8 +35,8 @@ public class DefaultPropertiesSetterDsl implements PropertiesSetterDsl {
   class Dsl1Impl implements Dsl1 {
 
     @Override
-    public Dsl2 environment(WiseEnvironment wiseEnvironment) {
-      DefaultPropertiesSetterDsl.this.wiseEnvironment = wiseEnvironment;
+    public Dsl2 profile(WiseProfile profile) {
+      DefaultPropertiesSetterDsl.this.wiseProfile = profile;
       return dsl2;
     }
   }
@@ -44,8 +44,8 @@ public class DefaultPropertiesSetterDsl implements PropertiesSetterDsl {
   class Dsl2Impl implements Dsl2 {
 
     @Override
-    public Dsl2 environment(WiseEnvironment wiseEnvironment) {
-      DefaultPropertiesSetterDsl.this.wiseEnvironment = wiseEnvironment;
+    public Dsl2 profile(WiseProfile profile) {
+      DefaultPropertiesSetterDsl.this.wiseProfile = profile;
       return this;
     }
 
@@ -57,7 +57,7 @@ public class DefaultPropertiesSetterDsl implements PropertiesSetterDsl {
 
     @Override
     public Dsl2 set(String name, Object value) {
-      WiseEnvironment.setDefaultProperty(source, wiseEnvironment, keyPrefix == null ? name : keyPrefix + name, value);
+      WiseEnvironment.setDefaultProperty(source, wiseProfile, keyPrefix == null ? name : keyPrefix + name, value);
       return this;
     }
   }

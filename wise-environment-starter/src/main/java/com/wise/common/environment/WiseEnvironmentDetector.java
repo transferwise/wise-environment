@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface WiseEnvironmentDetector {
 
-  List<WiseEnvironment> detect();
+  List<WiseProfile> detectActiveProfiles();
 }

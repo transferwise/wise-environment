@@ -43,6 +43,7 @@ public class WiseEnvironmentEnvironmentPostProcessor implements EnvironmentPostP
 
   @Override
   public int getOrder() {
-    return Ordered.HIGHEST_PRECEDENCE;
+    // To allow for environment post processors that _really_ need to run before this
+    return Ordered.HIGHEST_PRECEDENCE + 100;
   }
 }

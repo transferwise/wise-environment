@@ -6,12 +6,11 @@ import org.apache.commons.logging.Log;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.boot.logging.DeferredLogFactory;
-import org.springframework.core.annotation.Order;
+import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 @Slf4j
-@Order
-public class WiseEnvironmentEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class WiseEnvironmentEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
 
   private final Log log;
 
@@ -42,4 +41,9 @@ public class WiseEnvironmentEnvironmentPostProcessor implements EnvironmentPostP
     environment.getPropertySources().addLast(new WiseEnvironmentDefaultsPropertySource());
   }
 
+  @Override
+  public int getOrder() {
+    // To allow for environment post processors that _really_ need to run before this
+    return Ordered.HIGHEST_PRECEDENCE + 100;
+  }
 }

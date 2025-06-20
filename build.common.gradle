@@ -53,6 +53,8 @@ dependencies {
     local(libraries.lombok)
 
     compileOnly libraries.spotbugsAnnotations
+
+    testRuntimeOnly libraries.junitPlatformLauncher
 }
 
 java {

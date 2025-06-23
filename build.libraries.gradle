@@ -11,5 +11,6 @@ ext {
             lombok                : 'org.projectlombok:lombok',
             springBootStarter     : "org.springframework.boot:spring-boot-starter",
             springBootStarterTest : "org.springframework.boot:spring-boot-starter-test",
+            junitPlatformLauncher : 'org.junit.platform:junit-platform-launcher',
     ]
 }
